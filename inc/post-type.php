@@ -9,6 +9,8 @@ class WP_Central_Plugins_CPT {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_filter( 'post_updated_messages', array( $this, 'codex_book_updated_messages' ) );
+
+		add_filter( 'post_thumbnail_html', array( $this, 'filter_post_thumbnail' ), 10, 4 );
 	}
 
 
@@ -125,6 +127,18 @@ class WP_Central_Plugins_CPT {
 		}
 
 		return $messages;
+	}
+
+	public function filter_post_thumbnail( $html, $post_id, $post_thumbnail_id, $size ) {
+		if ( ! $post_thumbnail_id && 'large' == $size ) {
+			$post = get_post( $post_id );
+
+			if ( 'plugin' == $post->post_type && $post->banners ) {
+				$html = '<img width="772" height="250" src="' . $post->banners['banner-772x250'] . '" class="card-img-top img-fluid" />';
+			}
+		}
+
+		return $html;
 	}
 
 }
